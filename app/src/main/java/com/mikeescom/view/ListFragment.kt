@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.SearchView
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -59,6 +61,17 @@ class ListFragment : Fragment() {
         progressBar.visibility = View.GONE
         adapter = ListAdapter(response.RelatedTopics.toList() as ArrayList<RelatedTopic>)
         recyclerView.layoutManager = LinearLayoutManager(context)
+
+        adapter.setListener(object : ListAdapter.OnClickItem {
+            override fun onClick(relatedTopic: RelatedTopic) {
+                val bundle = Bundle()
+                bundle.putString("IMAGE", relatedTopic.Icon.URL)
+                bundle.putString("TITLE", relatedTopic.Text.split(" - ")[0])
+                bundle.putString("DESCRIPTION", relatedTopic.Text.split(" - ")[1])
+                NavHostFragment.findNavController(parentFragment!!)
+                    .navigate(R.id.action_listFragment_to_detailFragment, bundle)
+            }
+        })
         recyclerView.adapter = adapter
     }
 }

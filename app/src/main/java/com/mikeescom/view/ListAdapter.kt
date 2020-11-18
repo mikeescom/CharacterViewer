@@ -12,6 +12,7 @@ import com.mikeescom.model.dao.RelatedTopic
 
 class ListAdapter(private var relatedTopicList: ArrayList<RelatedTopic>) : RecyclerView.Adapter<ListAdapter.ListAdapterHolder>() , Filterable{
 
+    private lateinit var listener : OnClickItem
     private var relatedTopicFilteredList : ArrayList<RelatedTopic>
 
     init {
@@ -26,7 +27,8 @@ class ListAdapter(private var relatedTopicList: ArrayList<RelatedTopic>) : Recyc
 
     override fun onBindViewHolder(holder: ListAdapterHolder, position: Int) {
         val relatedTopic: RelatedTopic = relatedTopicFilteredList[position]
-        holder.characterName.text = relatedTopic.Text
+        holder.characterName.text = relatedTopic.Text.split(" - ")[0]
+        holder.itemView.setOnClickListener { listener.onClick(relatedTopic) }
     }
 
     override fun getItemCount(): Int {
@@ -34,6 +36,10 @@ class ListAdapter(private var relatedTopicList: ArrayList<RelatedTopic>) : Recyc
             return 0
         }
         return relatedTopicFilteredList.size
+    }
+
+    fun setListener(listener : OnClickItem) {
+        this.listener = listener
     }
 
     override fun getFilter(): Filter {
@@ -61,11 +67,14 @@ class ListAdapter(private var relatedTopicList: ArrayList<RelatedTopic>) : Recyc
                 relatedTopicFilteredList = results?.values as ArrayList<RelatedTopic>
                 notifyDataSetChanged()
             }
-
         }
     }
 
     inner class ListAdapterHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val characterName: TextView = itemView.findViewById(R.id.character_name)
+    }
+
+    interface OnClickItem {
+        fun onClick(relatedTopic: RelatedTopic)
     }
 }
