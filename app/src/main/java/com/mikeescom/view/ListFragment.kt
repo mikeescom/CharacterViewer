@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mikeescom.R
+import com.mikeescom.model.dao.RelatedTopic
 import com.mikeescom.model.dao.Response
 import com.mikeescom.viewmodel.MainViewModel
 
@@ -30,8 +31,19 @@ class ListFragment : Fragment() {
 
         progressBar = view.findViewById(R.id.progress_bar)
         searchView = view.findViewById(R.id.search_view)
+
+        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                adapter.filter.filter(newText)
+                return false
+            }
+        })
+
         recyclerView = view.findViewById(R.id.recycler_view)
-        adapter = ListAdapter(requireContext())
 
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         viewModel.getCharactersResponseLiveData()?.observe(viewLifecycleOwner, {
@@ -45,13 +57,8 @@ class ListFragment : Fragment() {
 
     private fun updateUI(response : Response) {
         progressBar.visibility = View.GONE
-        adapter.setResults(response.RelatedTopics)
-        recyclerView!!.addItemDecoration(
-            DividerItemDecoration(
-                recyclerView!!.context, DividerItemDecoration.VERTICAL
-            )
-        )
-        recyclerView!!.layoutManager = LinearLayoutManager(context)
+        adapter = ListAdapter(response.RelatedTopics.toList() as ArrayList<RelatedTopic>)
+        recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = adapter
     }
 }

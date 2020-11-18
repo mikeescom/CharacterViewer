@@ -3,16 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="12dp"
+    android:background="#a0c4ff"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:cardBackgroundColor="#ffc6ff"
         app:cardCornerRadius="15dp"
         app:cardElevation="2dp">
         <TextView
             android:id="@+id/character_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="15sp"
             android:layout_margin="10dp"/>
     </androidx.cardview.widget.CardView>
 </LinearLayout>

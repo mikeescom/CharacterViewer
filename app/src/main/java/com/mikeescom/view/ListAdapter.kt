@@ -1,17 +1,22 @@
 package com.mikeescom.view
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.mikeescom.R
 import com.mikeescom.model.dao.RelatedTopic
 
-class ListAdapter(private val context: Context) : RecyclerView.Adapter<ListAdapter.ListAdapterHolder>() {
+class ListAdapter(private var relatedTopicList: ArrayList<RelatedTopic>) : RecyclerView.Adapter<ListAdapter.ListAdapterHolder>() , Filterable{
 
-    private var results : Array<RelatedTopic>? = null
+    private var relatedTopicFilteredList : ArrayList<RelatedTopic>
+
+    init {
+        relatedTopicFilteredList = relatedTopicList
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListAdapterHolder {
         val itemView: View = LayoutInflater.from(parent.context)
@@ -20,20 +25,44 @@ class ListAdapter(private val context: Context) : RecyclerView.Adapter<ListAdapt
     }
 
     override fun onBindViewHolder(holder: ListAdapterHolder, position: Int) {
-        val relatedTopic: RelatedTopic = results!![position]
+        val relatedTopic: RelatedTopic = relatedTopicFilteredList[position]
         holder.characterName.text = relatedTopic.Text
     }
 
     override fun getItemCount(): Int {
-        if (results.isNullOrEmpty()) {
+        if (relatedTopicFilteredList.isNullOrEmpty()) {
             return 0
         }
-        return results!!.size
+        return relatedTopicFilteredList.size
     }
 
-    fun setResults(results: Array<RelatedTopic>?) {
-        this.results = results
-        notifyDataSetChanged()
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val charSearch = constraint.toString()
+                if (charSearch.isEmpty()) {
+                    relatedTopicFilteredList = relatedTopicList
+                } else {
+                    val resultList = ArrayList<RelatedTopic>()
+                    for (row in relatedTopicList) {
+                        if (row.Text.toLowerCase().contains(charSearch.toLowerCase())) {
+                            resultList.add(row)
+                        }
+                    }
+                    relatedTopicFilteredList = resultList
+                }
+                val filterResults = FilterResults()
+                filterResults.values = relatedTopicFilteredList
+                return filterResults
+            }
+
+            @Suppress("UNCHECKED_CAST")
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                relatedTopicFilteredList = results?.values as ArrayList<RelatedTopic>
+                notifyDataSetChanged()
+            }
+
+        }
     }
 
     inner class ListAdapterHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
