@@ -7,6 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.SearchView
+import androidx.core.os.bundleOf
+import androidx.fragment.app.FragmentContainerView
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
@@ -33,7 +36,7 @@ class ListFragment : Fragment() {
 
         progressBar = view.findViewById(R.id.progress_bar)
         searchView = view.findViewById(R.id.search_view)
-
+        adapter = ListAdapter(ArrayList())
         searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
@@ -65,11 +68,21 @@ class ListFragment : Fragment() {
         adapter.setListener(object : ListAdapter.OnClickItem {
             override fun onClick(relatedTopic: RelatedTopic) {
                 val bundle = Bundle()
-                bundle.putString("IMAGE", relatedTopic.Icon.URL)
-                bundle.putString("TITLE", relatedTopic.Text.split(" - ")[0])
-                bundle.putString("DESCRIPTION", relatedTopic.Text.split(" - ")[1])
-                NavHostFragment.findNavController(parentFragment!!)
-                    .navigate(R.id.action_listFragment_to_detailFragment, bundle)
+                val titleStr = relatedTopic.Text.split(" - ")[0]
+                val imageStr = relatedTopic.Icon.URL
+                val descriptionStr = relatedTopic.Text.split(" - ")[1]
+
+                bundle.putString("IMAGE", imageStr)
+                bundle.putString("TITLE", titleStr)
+                bundle.putString("DESCRIPTION", descriptionStr)
+
+                if (requireActivity().findViewById<FragmentContainerView>(R.id.list_fragment) != null) {
+                    setFragmentResult("REQUEST"
+                        , bundleOf("TITLE" to titleStr, "IMAGE" to imageStr, "DESCRIPTION" to descriptionStr))
+                } else {
+                    NavHostFragment.findNavController(parentFragment!!)
+                        .navigate(R.id.action_listFragment_to_detailFragment, bundle)
+                }
             }
         })
         recyclerView.adapter = adapter

@@ -51,7 +51,8 @@ class ListAdapter(private var relatedTopicList: ArrayList<RelatedTopic>) : Recyc
                 } else {
                     val resultList = ArrayList<RelatedTopic>()
                     for (row in relatedTopicList) {
-                        if (row.Text.toLowerCase().contains(charSearch.toLowerCase())) {
+                        val name = row.Text.toLowerCase().split(" - ")[0]
+                        if (name.contains(charSearch.toLowerCase())) {
                             resultList.add(row)
                         }
                     }
